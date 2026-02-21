@@ -1,7 +1,4 @@
-// ============================================================
-// TX Engine — Technologic Experience Engine
 // Blueprint System (TXB)
-// ============================================================
 
 #include <vector>
 #include <unordered_map>
@@ -10,28 +7,19 @@
 #include <cstdint>
 #include <cassert>
 
-// ------------------------------------------------------------
 // Tipos base
-// ------------------------------------------------------------
-
 using TXNodeID = uint32_t;
 using TXPinID  = uint16_t;
 using TXOpCode = uint8_t;
 
-// ------------------------------------------------------------
 // Contexto de ejecución (por entidad / actor)
-// ------------------------------------------------------------
-
 struct TXExecutionContext
 {
     float DeltaTime;
     void* UserData;   // puntero a Actor, Entity, etc.
 };
 
-// ------------------------------------------------------------
 // Tipos de valores soportados
-// ------------------------------------------------------------
-
 enum class TXValueType : uint8_t
 {
     None,
@@ -55,10 +43,7 @@ struct TXValue
     };
 };
 
-// ------------------------------------------------------------
 // Nodo Blueprint (definición estática)
-// ------------------------------------------------------------
-
 struct TXBlueprintNode
 {
     TXNodeID ID;
@@ -67,10 +52,7 @@ struct TXBlueprintNode
     uint16_t OutputCount;
 };
 
-// ------------------------------------------------------------
 // Bytecode Blueprint
-// ------------------------------------------------------------
-
 struct TXBlueprintBytecode
 {
     std::vector<TXOpCode> Instructions;
@@ -207,4 +189,5 @@ void ExampleBlueprint()
 
     TXBlueprintVM VM;
     VM.Execute(BP, Ctx);
+
 }
