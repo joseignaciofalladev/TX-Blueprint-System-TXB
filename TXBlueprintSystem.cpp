@@ -59,20 +59,14 @@ struct TXBlueprintBytecode
     std::vector<TXValue> Constants;
 };
 
-// ------------------------------------------------------------
 // Definición de una función de nodo
-// ------------------------------------------------------------
-
 using TXNodeFunction = std::function<void(
     TXExecutionContext&,
     const TXValue* Inputs,
     TXValue* Outputs
 )>;
 
-// ------------------------------------------------------------
 // Registro global de nodos
-// ------------------------------------------------------------
-
 class TXNodeRegistry
 {
 public:
@@ -97,10 +91,7 @@ private:
     std::unordered_map<TXOpCode, TXNodeFunction> NodeFunctions;
 };
 
-// ------------------------------------------------------------
 // Máquina virtual Blueprint
-// ------------------------------------------------------------
-
 class TXBlueprintVM
 {
 public:
@@ -128,10 +119,7 @@ public:
     }
 };
 
-// ------------------------------------------------------------
 // Nodos básicos
-// ------------------------------------------------------------
-
 enum : TXOpCode
 {
     TX_OP_ADD_FLOAT = 1,
@@ -165,10 +153,7 @@ void RegisterCoreNodes()
         });
 }
 
-// ------------------------------------------------------------
 // Ejemplo de uso
-// ------------------------------------------------------------
-
 void ExampleBlueprint()
 {
     RegisterCoreNodes();
