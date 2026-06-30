@@ -13,15 +13,13 @@ using TXPinID  = uint16_t;
 using TXOpCode = uint8_t;
 
 // Contexto de ejecución (por entidad / actor)
-struct TXExecutionContext
-{
+struct TXExecutionContext{
     float DeltaTime;
     void* UserData;   // puntero a Actor, Entity, etc.
 };
 
 // Tipos de valores soportados
-enum class TXValueType : uint8_t
-{
+enum class TXValueType : uint8_t{
     None,
     Int,
     Float,
@@ -30,12 +28,10 @@ enum class TXValueType : uint8_t
     Pointer
 };
 
-struct TXValue
-{
+struct TXValue{
     TXValueType Type = TXValueType::None;
 
-    union
-    {
+    union{
         int     Int;
         float   Float;
         bool    Bool;
@@ -44,8 +40,7 @@ struct TXValue
 };
 
 // Nodo Blueprint (definición estática)
-struct TXBlueprintNode
-{
+struct TXBlueprintNode{
     TXNodeID ID;
     TXOpCode OpCode;
     uint16_t InputCount;
@@ -53,8 +48,7 @@ struct TXBlueprintNode
 };
 
 // Bytecode Blueprint
-struct TXBlueprintBytecode
-{
+struct TXBlueprintBytecode{
     std::vector<TXOpCode> Instructions;
     std::vector<TXValue> Constants;
 };
@@ -67,22 +61,18 @@ using TXNodeFunction = std::function<void(
 )>;
 
 // Registro global de nodos
-class TXNodeRegistry
-{
+class TXNodeRegistry{
 public:
-    static TXNodeRegistry& Instance()
-    {
+    static TXNodeRegistry& Instance(){
         static TXNodeRegistry Registry;
         return Registry;
     }
 
-    void RegisterNode(TXOpCode opcode, TXNodeFunction fn)
-    {
+    void RegisterNode(TXOpCode opcode, TXNodeFunction fn){
         NodeFunctions[opcode] = fn;
     }
 
-    TXNodeFunction& Get(TXOpCode opcode)
-    {
+    TXNodeFunction& Get(TXOpCode opcode){
         assert(NodeFunctions.count(opcode));
         return NodeFunctions[opcode];
     }
@@ -92,28 +82,23 @@ private:
 };
 
 // Máquina virtual Blueprint
-class TXBlueprintVM
-{
+class TXBlueprintVM{
 public:
     void Execute(
         const TXBlueprintBytecode& Bytecode,
-        TXExecutionContext& Context)
-    {
+        TXExecutionContext& Context){
+        
         const TXOpCode* IP = Bytecode.Instructions.data();
         const TXOpCode* End = IP + Bytecode.Instructions.size();
-
         TXValue Stack[64];   // stack fijo = cache friendly
         int SP = 0;
 
         while (IP < End)
         {
             TXOpCode Op = *IP++;
-
             TXNodeFunction& Fn = TXNodeRegistry::Instance().Get(Op);
-
             // Por simplicidad: 2 inputs, 1 output
             Fn(Context, &Stack[SP - 2], &Stack[SP - 2]);
-
             SP--; // consumir inputs -> producir output
         }
     }
@@ -127,41 +112,34 @@ enum : TXOpCode
     TX_OP_PRINT_FLOAT
 };
 
-void RegisterCoreNodes()
-{
+void RegisterCoreNodes(){
     TXNodeRegistry::Instance().RegisterNode(
         TX_OP_ADD_FLOAT,
-        [](TXExecutionContext&, const TXValue* In, TXValue* Out)
-        {
+        [](TXExecutionContext&, const TXValue* In, TXValue* Out){
             Out->Type = TXValueType::Float;
             Out->Float = In[0].Float + In[1].Float;
         });
 
     TXNodeRegistry::Instance().RegisterNode(
         TX_OP_MUL_FLOAT,
-        [](TXExecutionContext&, const TXValue* In, TXValue* Out)
-        {
+        [](TXExecutionContext&, const TXValue* In, TXValue* Out){
             Out->Type = TXValueType::Float;
             Out->Float = In[0].Float * In[1].Float;
         });
 
     TXNodeRegistry::Instance().RegisterNode(
         TX_OP_PRINT_FLOAT,
-        [](TXExecutionContext&, const TXValue* In, TXValue*)
-        {
+        [](TXExecutionContext&, const TXValue* In, TXValue*){
             printf("[TXB] %f\n", In[0].Float);
         });
 }
 
 // Ejemplo de uso
-void ExampleBlueprint()
-{
+void ExampleBlueprint(){
     RegisterCoreNodes();
-
     TXBlueprintBytecode BP;
 
     // Simula: print( (2.0 + 3.0) * 4.0 )
-
     BP.Instructions = {
         TX_OP_ADD_FLOAT,
         TX_OP_MUL_FLOAT,
@@ -174,5 +152,4 @@ void ExampleBlueprint()
 
     TXBlueprintVM VM;
     VM.Execute(BP, Ctx);
-
 }
